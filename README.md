@@ -5,6 +5,10 @@
 [![CI](https://github.com/bsantacruzms/windows-cleaner/actions/workflows/ci.yml/badge.svg)](https://github.com/bsantacruzms/windows-cleaner/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
+**Status:** v0.1 — early but working. The solution builds clean (0 warnings / 0 errors)
+with 13 unit tests passing. Six health modules are implemented on top of a reversible
+safety layer, driven by both a WinUI 3 desktop app and a CLI.
+
 ## Why another cleaner?
 
 Most "cleaners" only delete caches. The hard problems — a Microsoft Store add-on stuck
@@ -68,7 +72,35 @@ dotnet run --project src/WindowsCleaner.Cli -- fix --all --dry-run
 dotnet run --project src/WindowsCleaner.App
 ```
 
-> The app relaunches itself elevated when a repair needs administrator rights.
+> The WinUI app ships with a `requireAdministrator` manifest, so Windows prompts for
+> elevation (UAC) when you launch it — repairs need administrator rights.
+
+### CLI reference
+
+```
+wclean scan                             Scan and print a health report
+wclean fix --all [--dry-run]            Fix every fixable issue
+wclean fix --module <id> [--dry-run]    Fix issues from a single module
+```
+
+Module ids: `store-appx`, `temp-cleanup`, `windows-update`, `system-integrity`,
+`startup`, `privacy`.
+
+Example scan output:
+
+```
+Health score: 80/100 (Good)
+Issues: 14   Reclaimable: 529.2 MB
+
+- Store / AppX Repair: OK
+- Temp & Cache Cleanup: 2 issue(s)
+    [Low] User temp files: 521.2 MB
+    [Low] Microsoft Store cache: 8.1 MB
+- Windows Update Reset: OK
+- System Integrity (SFC/DISM): 1 issue(s)
+- Startup & Services: 10 issue(s)
+- Privacy Cleanup: 1 issue(s)
+```
 
 ## Safety
 
@@ -77,10 +109,27 @@ dotnet run --project src/WindowsCleaner.App
 - `--dry-run` shows exactly what would change.
 - Nothing is deleted outside well-known, documented locations.
 
+## Development
+
+```powershell
+# Run the unit tests
+dotnet test tests/WindowsCleaner.Core.Tests
+
+# Build a single project
+dotnet build src/WindowsCleaner.Core/WindowsCleaner.Core.csproj
+```
+
+Coding conventions live in [`.editorconfig`](.editorconfig): file-scoped namespaces,
+nullable reference types and `_camelCase` private fields.
+
+> If the repository lives on a mapped network drive, Git may report *dubious ownership*.
+> Clear it with `git config --global --add safe.directory '<path>'`.
+
 ## Contributing
 
 Issues and PRs welcome. New capabilities are just new `IHealthModule` implementations —
-see [`src/WindowsCleaner.Core/Modules`](src/WindowsCleaner.Core/Modules).
+see [`src/WindowsCleaner.Core/Modules`](src/WindowsCleaner.Core/Modules). Register the
+module in `DefaultModules.CreateAll` and it shows up in both the app and the CLI.
 
 ## License
 
