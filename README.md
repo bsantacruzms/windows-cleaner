@@ -9,6 +9,28 @@
 with 13 unit tests passing. Six health modules are implemented on top of a reversible
 safety layer, driven by both a WinUI 3 desktop app and a CLI.
 
+## Download & install
+
+Grab the latest build from the **[Releases page](https://github.com/bsantacruzms/windows-cleaner/releases)**
+— no prerequisites needed, the .NET runtime is bundled.
+
+| Download | Notes |
+| -------- | ----- |
+| `WindowsCleanerTool-<version>-Setup.exe` | Recommended. Installs to Program Files with a Start Menu shortcut and runs elevated for repairs. |
+| `WindowsCleanerTool-<version>-win-x64-portable.zip` | No install — unzip and run `WindowsCleaner.App.exe`. |
+
+New versions are published to the Releases page automatically whenever a `v*` tag is
+pushed (see [`.github/workflows/release.yml`](.github/workflows/release.yml)).
+
+### Build the installer yourself
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/build-release.ps1                 # -> dist/
+powershell -ExecutionPolicy Bypass -File scripts/build-release.ps1 -Version 0.2.0
+```
+
+Requires [Inno Setup](https://jrsoftware.org/isinfo.php) (`winget install JRSoftware.InnoSetup`).
+
 ## Why another cleaner?
 
 Most "cleaners" only delete caches. The hard problems — a Microsoft Store add-on stuck

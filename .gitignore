@@ -56,3 +56,6 @@ Thumbs.db
 ## App runtime data (local backups & logs produced by the tool)
 artifacts/
 TestResults/
+
+## Release artifacts (published to GitHub Releases, not committed)
+dist/
