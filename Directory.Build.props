@@ -6,10 +6,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    <Authors>bsantacruzms</Authors>
+    <Authors>Brian Santacruz</Authors>
     <Product>Windows Cleaner Tool</Product>
     <Company>Windows Cleaner Tool (Open Source)</Company>
-    <Copyright>Copyright (c) 2026 bsantacruzms</Copyright>
+    <Copyright>Copyright (c) 2026 Brian Santacruz</Copyright>
     <Version>0.1.0</Version>
     <RepositoryUrl>https://github.com/bsantacruzms/windows-cleaner.git</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

@@ -9,7 +9,7 @@
 #define PublishDir SourcePath + "..\artifacts\publish"
 
 #define MyAppName "Windows Cleaner Tool"
-#define MyAppPublisher "bsantacruzms"
+#define MyAppPublisher "Brian Santacruz"
 #define MyAppURL "https://github.com/bsantacruzms/windows-cleaner"
 #define MyAppExeName "WindowsCleaner.App.exe"
 

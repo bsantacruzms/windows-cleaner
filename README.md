@@ -155,4 +155,4 @@ module in `DefaultModules.CreateAll` and it shows up in both the app and the CLI
 
 ## License
 
-[MIT](LICENSE) © 2026 bsantacruzms
+[MIT](LICENSE) © 2026 Brian Santacruz
