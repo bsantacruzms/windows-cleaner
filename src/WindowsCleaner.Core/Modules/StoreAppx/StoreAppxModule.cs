@@ -28,6 +28,7 @@ public sealed class StoreAppxModule : IHealthModule
         "that cause errors like 0x80070003.";
     public string Category => "System";
     public bool RequiresElevation => true;
+    public bool IncludeInAutoClean => true;
 
     public async Task<ScanResult> ScanAsync(CancellationToken cancellationToken = default)
     {

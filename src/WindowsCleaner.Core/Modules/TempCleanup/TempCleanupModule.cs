@@ -11,6 +11,7 @@ public sealed class TempCleanupModule : IHealthModule
     public string Description => "Reclaims disk space from temporary and cache folders.";
     public string Category => "Cleanup";
     public bool RequiresElevation => false;
+    public bool IncludeInAutoClean => true;
 
     private static IEnumerable<(string Key, string Title, string Path)> Targets()
     {

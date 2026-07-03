@@ -6,46 +6,75 @@
     xmlns:local="using:WindowsCleaner.App"
     Title="Windows Cleaner Tool">
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="24" RowSpacing="16">
+    <Grid Padding="24" RowSpacing="16" RowDefinitions="Auto,Auto,Auto,*">
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
-            <TextBlock Text="Windows Health" FontSize="28" FontWeight="SemiBold" VerticalAlignment="Center" />
-            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+        <!-- Header: title, environment info, health badge -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="Windows Cleaner Tool" FontSize="28" FontWeight="SemiBold" />
+                <TextBlock x:Name="EnvText" FontSize="12"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+            <Border Grid.Column="1" VerticalAlignment="Top"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
-                    CornerRadius="8" Padding="12,4" VerticalAlignment="Center">
-                <TextBlock x:Name="ScoreText" Text="Not scanned" FontSize="16" FontWeight="SemiBold" />
+                    CornerRadius="8" Padding="12,4">
+                <TextBlock x:Name="ScoreText" Text="Ready" FontWeight="SemiBold" />
             </Border>
+        </Grid>
+
+        <!-- Unsupported OS warning -->
+        <InfoBar Grid.Row="1" x:Name="SupportBar" IsOpen="False" IsClosable="False"
+                 Severity="Warning" Title="Unsupported Windows version" />
+
+        <!-- One-click clean -->
+        <StackPanel Grid.Row="2" Spacing="12" HorizontalAlignment="Center" Margin="0,20,0,0">
+            <Button x:Name="CleanButton" Click="OnCleanClick" Style="{StaticResource AccentButtonStyle}"
+                    MinWidth="240" Height="64">
+                <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                    <ProgressRing x:Name="Busy" IsActive="False" Width="22" Height="22" />
+                    <TextBlock x:Name="CleanButtonText" Text="Clean" FontSize="22" FontWeight="SemiBold" />
+                </StackPanel>
+            </Button>
+            <TextBlock x:Name="StatusText" HorizontalAlignment="Center" TextWrapping="Wrap"
+                       HorizontalTextAlignment="Center"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       Text="Click Clean and the tool scans and repairs your system automatically." />
         </StackPanel>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-            <Button x:Name="ScanButton" Content="Scan" Click="OnScanClick" Style="{StaticResource AccentButtonStyle}" />
-            <Button x:Name="FixButton" Content="Fix selected" Click="OnFixClick" IsEnabled="False" />
-            <CheckBox x:Name="DryRunCheck" Content="Dry run (preview only)" VerticalAlignment="Center" />
-            <ProgressRing x:Name="Busy" IsActive="False" Width="24" Height="24" />
-            <TextBlock x:Name="StatusText" VerticalAlignment="Center"
-                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-        </StackPanel>
+        <!-- Advanced: full issue list with select-all -->
+        <Expander Grid.Row="3" x:Name="DetailsExpander" Header="Details (advanced)"
+                  HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                  VerticalAlignment="Top" Margin="0,8,0,0">
+            <Grid RowDefinitions="Auto,Auto" RowSpacing="8" MinWidth="640">
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8">
+                    <Button Content="Scan" Click="OnScanClick" />
+                    <Button Content="Select all" Click="OnSelectAllClick" />
+                    <Button x:Name="FixSelectedButton" Content="Fix selected" Click="OnFixSelectedClick" IsEnabled="False" />
+                    <CheckBox x:Name="DryRunCheck" Content="Dry run (preview only)" VerticalAlignment="Center" />
+                </StackPanel>
 
-        <ListView Grid.Row="2" x:Name="IssuesList" SelectionMode="Multiple"
-                  BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" CornerRadius="8">
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="local:IssueRow">
-                    <Grid ColumnDefinitions="Auto,*,Auto" Padding="8" ColumnSpacing="12">
-                        <Border Grid.Column="0" Width="10" Height="10" CornerRadius="5"
-                                VerticalAlignment="Center" Background="{x:Bind SeverityBrush}" />
-                        <StackPanel Grid.Column="1">
-                            <TextBlock Text="{x:Bind Title}" FontWeight="SemiBold" TextWrapping="Wrap" />
-                            <TextBlock Text="{x:Bind Description}" TextWrapping="Wrap"
-                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" />
-                        </StackPanel>
-                        <TextBlock Grid.Column="2" Text="{x:Bind ModuleName}" VerticalAlignment="Center"
-                                   Foreground="{ThemeResource TextFillColorTertiaryBrush}" FontSize="12" />
-                    </Grid>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-
-        <TextBlock Grid.Row="3" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12"
-                   Text="A System Restore point and registry backups are created before any change." />
+                <ListView Grid.Row="1" x:Name="IssuesList" SelectionMode="Multiple"
+                          MinHeight="200" MaxHeight="320"
+                          BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                          CornerRadius="8">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="local:IssueRow">
+                            <Grid ColumnDefinitions="Auto,*,Auto" Padding="8" ColumnSpacing="12">
+                                <Border Grid.Column="0" Width="10" Height="10" CornerRadius="5"
+                                        VerticalAlignment="Center" Background="{x:Bind SeverityBrush}" />
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="{x:Bind Title}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                                    <TextBlock Text="{x:Bind Description}" TextWrapping="Wrap"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" />
+                                </StackPanel>
+                                <TextBlock Grid.Column="2" Text="{x:Bind ModuleName}" VerticalAlignment="Center"
+                                           Foreground="{ThemeResource TextFillColorTertiaryBrush}" FontSize="12" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+        </Expander>
     </Grid>
 </Window>

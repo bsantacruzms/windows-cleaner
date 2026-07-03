@@ -18,6 +18,7 @@ public sealed class WindowsUpdateResetModule : IHealthModule
     public string Description => "Clears a stuck Windows Update download queue that causes update errors.";
     public string Category => "System";
     public bool RequiresElevation => true;
+    public bool IncludeInAutoClean => true;
 
     public Task<ScanResult> ScanAsync(CancellationToken cancellationToken = default)
     {

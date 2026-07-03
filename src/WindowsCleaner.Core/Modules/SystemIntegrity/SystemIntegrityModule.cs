@@ -12,6 +12,8 @@ public sealed class SystemIntegrityModule : IHealthModule
     public string Description => "Repairs corrupted Windows system files using DISM and SFC.";
     public string Category => "System";
     public bool RequiresElevation => true;
+    // Slow (DISM+SFC can take minutes); keep it a deliberate, manual action.
+    public bool IncludeInAutoClean => false;
 
     public Task<ScanResult> ScanAsync(CancellationToken cancellationToken = default)
     {

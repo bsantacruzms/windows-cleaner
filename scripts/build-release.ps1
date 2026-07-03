@@ -49,22 +49,7 @@ if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
 Write-Host "==> Creating portable zip..." -ForegroundColor Cyan
 Compress-Archive -Path (Join-Path $publishDir "*") -DestinationPath $zipPath
 
-# 3) Installer via Inno Setup.
-$iscc = Get-ChildItem `
-    "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe", `
-    "C:\Program Files (x86)\Inno Setup 6\ISCC.exe", `
-    "C:\Program Files\Inno Setup 6\ISCC.exe" `
-    -ErrorAction SilentlyContinue | Select-Object -First 1
-
-if (-not $iscc) {
-    throw "ISCC.exe (Inno Setup) not found. Install it with: winget install JRSoftware.InnoSetup"
-}
-
-$iss = Join-Path $root "installer\WindowsCleanerTool.iss"
-Write-Host "==> Compiling installer with Inno Setup..." -ForegroundColor Cyan
-& $iscc.FullName "/DMyAppVersion=$Version" $iss
-if ($LASTEXITCODE -ne 0) { throw "Inno Setup compilation failed" }
-
+# 3) Portable archive is the only distributable (portable-only tool).
 Write-Host "`n==> Done. Artifacts in $distDir :" -ForegroundColor Green
 Get-ChildItem $distDir -File |
     Select-Object Name, @{ n = "Size"; e = { "{0:N1} MB" -f ($_.Length / 1MB) } } |

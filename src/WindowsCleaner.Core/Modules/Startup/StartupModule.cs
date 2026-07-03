@@ -19,6 +19,8 @@ public sealed class StartupModule : IHealthModule
     public string Description => "Lists programs that launch at sign-in so you can disable the ones you don't need.";
     public string Category => "Performance";
     public bool RequiresElevation => false;
+    // Disabling startup entries is a user choice, not an automatic cleanup.
+    public bool IncludeInAutoClean => false;
 
     public Task<ScanResult> ScanAsync(CancellationToken cancellationToken = default)
     {

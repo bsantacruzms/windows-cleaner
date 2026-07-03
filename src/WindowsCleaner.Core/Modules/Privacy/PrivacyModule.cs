@@ -17,6 +17,8 @@ public sealed class PrivacyModule : IHealthModule
     public string Description => "Reviews common privacy switches and hardens them on request.";
     public string Category => "Privacy";
     public bool RequiresElevation => false;
+    // Privacy changes are opt-in preferences, not automatic cleanup.
+    public bool IncludeInAutoClean => false;
 
     private sealed record Toggle(string Key, string Title, string SubKey, string ValueName, int SecureValue, string Description);
 

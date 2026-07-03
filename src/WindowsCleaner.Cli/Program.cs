@@ -17,6 +17,9 @@ switch (command)
     case "fix":
         await FixAsync();
         break;
+    case "clean":
+        await CleanAsync();
+        break;
     default:
         PrintHelp();
         break;
@@ -26,9 +29,38 @@ return;
 
 async Task ScanAsync()
 {
+    PrintEnvironment();
     Console.WriteLine("Scanning Windows health...\n");
     var report = await engine.ScanAllAsync();
     PrintReport(report);
+}
+
+async Task CleanAsync()
+{
+    PrintEnvironment();
+    if (!ElevationHelper.IsElevated())
+    {
+        Console.WriteLine("WARNING: not running as Administrator; some fixes may fail.\n");
+    }
+
+    var progress = new Progress<string>(Console.WriteLine);
+    var summary = await engine.AutoCleanAsync(new FixOptions { DryRun = dryRun }, progress);
+
+    Console.WriteLine();
+    Console.WriteLine($"Clean complete: fixed {summary.Fixed}, failed {summary.Failed}, " +
+        $"freed {TempCleanupModule.FormatBytes(summary.ReclaimedBytes)}.");
+}
+
+void PrintEnvironment()
+{
+    var env = EnvironmentInfo.Current();
+    Console.WriteLine($"Windows Cleaner Tool {env.AppVersion}  -  {env.WindowsName}");
+    if (!env.IsSupported)
+    {
+        Console.WriteLine("WARNING: " + env.SupportMessage);
+    }
+
+    Console.WriteLine();
 }
 
 async Task FixAsync()
@@ -110,8 +142,7 @@ void PrintHelp()
         """
         Windows Cleaner Tool (CLI)
 
-        Usage:
-          wclean scan                             Scan and show a health report
+        Usage:          wclean clean [--dry-run]                Scan and auto-fix everything (one-click)          wclean scan                             Scan and show a health report
           wclean fix --all [--dry-run]            Fix all fixable issues
           wclean fix --module <id> [--dry-run]    Fix issues from a single module
 

@@ -17,6 +17,7 @@ public class HealthEngineTests
         public string Description => string.Empty;
         public string Category => "Test";
         public bool RequiresElevation => false;
+        public bool IncludeInAutoClean => true;
 
         public Task<ScanResult> ScanAsync(CancellationToken cancellationToken = default)
         {
@@ -77,5 +78,16 @@ public class HealthEngineTests
 
         await Assert.ThrowsAsync<InvalidOperationException>(
             () => engine.FixAsync(issue, new FixOptions()));
+    }
+
+    [Fact]
+    public async Task AutoClean_FixesAutoCleanIssues()
+    {
+        var engine = new HealthEngine(new[] { new FakeModule() });
+
+        var summary = await engine.AutoCleanAsync(new FixOptions());
+
+        Assert.Equal(1, summary.Fixed);
+        Assert.Equal(0, summary.Failed);
     }
 }

@@ -67,4 +67,60 @@ public sealed class HealthEngine
 
         return module.FixAsync(issue, options, cancellationToken);
     }
+
+    /// <summary>
+    /// One-click clean: scans, then automatically fixes every fixable issue from modules
+    /// flagged <see cref="IHealthModule.IncludeInAutoClean"/> (cleanup and repair only).
+    /// </summary>
+    public async Task<CleanSummary> AutoCleanAsync(
+        FixOptions options,
+        IProgress<string>? progress = null,
+        CancellationToken cancellationToken = default)
+    {
+        progress?.Report("Scanning your system...");
+        var report = await ScanAllAsync(cancellationToken).ConfigureAwait(false);
+
+        var autoModules = _modules
+            .Where(m => m.IncludeInAutoClean)
+            .Select(m => m.Id)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var issues = report.AllIssues
+            .Where(i => i.IsFixable && autoModules.Contains(i.ModuleId))
+            .ToList();
+
+        var results = new List<FixResult>(issues.Count);
+        long reclaimed = 0;
+        var fixedCount = 0;
+        var failed = 0;
+
+        foreach (var issue in issues)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            progress?.Report($"Cleaning: {issue.Title}");
+
+            var result = await FixAsync(issue, options, cancellationToken).ConfigureAwait(false);
+            results.Add(result);
+
+            if (result.Success)
+            {
+                fixedCount++;
+                reclaimed += issue.ReclaimableBytes;
+            }
+            else
+            {
+                failed++;
+            }
+        }
+
+        progress?.Report("Finishing up...");
+        return new CleanSummary
+        {
+            Fixed = fixedCount,
+            Failed = failed,
+            ReclaimedBytes = reclaimed,
+            Results = results,
+            Report = report
+        };
+    }
 }

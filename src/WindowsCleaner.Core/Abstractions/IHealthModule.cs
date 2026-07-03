@@ -20,6 +20,12 @@ public interface IHealthModule
     /// <summary>True if applying fixes for this module requires administrator rights.</summary>
     bool RequiresElevation { get; }
 
+    /// <summary>
+    /// True if this module's fixes are safe to apply automatically from the one-click
+    /// "Clean" action (cleanup/repair). User-preference modules (startup, privacy) are false.
+    /// </summary>
+    bool IncludeInAutoClean { get; }
+
     /// <summary>Detects issues without changing anything.</summary>
     Task<ScanResult> ScanAsync(CancellationToken cancellationToken = default);
 

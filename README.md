@@ -5,31 +5,33 @@
 [![CI](https://github.com/bsantacruzms/windows-cleaner/actions/workflows/ci.yml/badge.svg)](https://github.com/bsantacruzms/windows-cleaner/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**Status:** v0.1 — early but working. The solution builds clean (0 warnings / 0 errors)
-with 13 unit tests passing. Six health modules are implemented on top of a reversible
-safety layer, driven by both a WinUI 3 desktop app and a CLI.
+**Status:** v0.2 — early but working. Builds clean (0 warnings / 0 errors) with 14 unit
+tests passing. A one-click **Clean** button (WinUI 3) and a CLI drive six health modules
+on top of a reversible safety layer. Distributed as a **portable** app — no installer.
 
 ## Download & install
 
-Grab the latest build from the **[Releases page](https://github.com/bsantacruzms/windows-cleaner/releases)**
-— no prerequisites needed, the .NET runtime is bundled.
+Windows Cleaner Tool is **portable** — no installation required. Grab the latest `.zip`
+from the **[Releases page](https://github.com/bsantacruzms/windows-cleaner/releases)**,
+unzip it anywhere, and run **`WindowsCleaner.App.exe`**. No prerequisites — the .NET
+runtime is bundled, so it works on a clean Windows install.
 
-| Download | Notes |
-| -------- | ----- |
-| `WindowsCleanerTool-<version>-Setup.exe` | Recommended. Installs to Program Files with a Start Menu shortcut and runs elevated for repairs. |
-| `WindowsCleanerTool-<version>-win-x64-portable.zip` | No install — unzip and run `WindowsCleaner.App.exe`. |
+Just click **Clean** and the tool scans and repairs everything automatically. The header
+shows the app version and your Windows version; if your Windows build is unsupported it
+warns you before running.
+
+> The app requests administrator rights (UAC) on launch, since repairs touch system
+> components. Windows 10 version 2004 (build 19041) or newer is required.
 
 New versions are published to the Releases page automatically whenever a `v*` tag is
 pushed (see [`.github/workflows/release.yml`](.github/workflows/release.yml)).
 
-### Build the installer yourself
+### Build it yourself
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts/build-release.ps1                 # -> dist/
+powershell -ExecutionPolicy Bypass -File scripts/build-release.ps1                 # -> dist/*.zip
 powershell -ExecutionPolicy Bypass -File scripts/build-release.ps1 -Version 0.2.0
 ```
-
-Requires [Inno Setup](https://jrsoftware.org/isinfo.php) (`winget install JRSoftware.InnoSetup`).
 
 ## Why another cleaner?
 
@@ -47,7 +49,7 @@ Windows Cleaner Tool is built around a simple loop that mirrors how a good techn
 
 Every fix is reversible, supports a **dry-run** preview, and is logged.
 
-## Health modules (v0.1)
+## Health modules (v0.2)
 
 | Module | What it does |
 | ------ | ------------ |
@@ -100,6 +102,7 @@ dotnet run --project src/WindowsCleaner.App
 ### CLI reference
 
 ```
+wclean clean [--dry-run]                Scan and auto-fix everything (one-click)
 wclean scan                             Scan and print a health report
 wclean fix --all [--dry-run]            Fix every fixable issue
 wclean fix --module <id> [--dry-run]    Fix issues from a single module
