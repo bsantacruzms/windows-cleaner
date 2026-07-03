@@ -1,0 +1,17 @@
+<Project>
+  <!-- Common properties shared by all projects in the solution. -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <Authors>bsantacruzms</Authors>
+    <Product>Windows Cleaner Tool</Product>
+    <Company>Windows Cleaner Tool (Open Source)</Company>
+    <Copyright>Copyright (c) 2026 bsantacruzms</Copyright>
+    <Version>0.1.0</Version>
+    <RepositoryUrl>https://github.com/bsantacruzms/windows-cleaner.git</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+</Project>

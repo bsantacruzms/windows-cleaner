@@ -1,0 +1,58 @@
+## .NET / Visual Studio
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+build/
+bld/
+[Oo]ut/
+[Ll]og/
+[Ll]ogs/
+
+## Rider
+.idea/
+
+## VS Code (keep shared settings, ignore local)
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/settings.json
+
+## NuGet
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+.nuget/
+
+## MSIX / WinUI publish output
+AppPackages/
+BundleArtifacts/
+*.appx
+*.appxbundle
+*.msix
+*.msixbundle
+GeneratedArtifacts/
+_pkginfo.txt
+
+## Tooling / OS
+*.tmp
+*.log
+Thumbs.db
+.DS_Store
+
+## App runtime data (local backups & logs produced by the tool)
+artifacts/
+TestResults/
