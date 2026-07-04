@@ -1,5 +1,4 @@
-using Microsoft.UI;
-using Microsoft.UI.Xaml.Media;
+using System.Windows.Media;
 using WindowsCleaner.Core.Models;
 
 namespace WindowsCleaner.App;

@@ -38,19 +38,28 @@ if (Test-Path $publishDir) { Remove-Item $publishDir -Recurse -Force }
 New-Item -ItemType Directory -Force -Path $publishDir | Out-Null
 New-Item -ItemType Directory -Force -Path $distDir | Out-Null
 
-# 1) Publish the app, self-contained for win-x64.
-Write-Host "==> Publishing self-contained win-x64..." -ForegroundColor Cyan
-dotnet publish $appProj -c $Configuration -r win-x64 --self-contained true -o $publishDir "/p:Version=$Version"
+# Remove previous release artifacts so only the current single-file exe remains.
+Get-ChildItem $distDir -File -ErrorAction SilentlyContinue | Remove-Item -Force
+
+# 1) Publish as a single self-contained .exe. Everything (managed + native + content)
+#    is bundled into one file that self-extracts to a temp folder at runtime.
+Write-Host "==> Publishing single-file, self-contained win-x64..." -ForegroundColor Cyan
+dotnet publish $appProj -c $Configuration -r win-x64 --self-contained true -o $publishDir `
+    "/p:Version=$Version" `
+    "/p:PublishSingleFile=true" `
+    "/p:IncludeNativeLibrariesForSelfExtract=true" `
+    "/p:IncludeAllContentForSelfExtract=true" `
+    "/p:EnableCompressionInSingleFile=true" `
+    "/p:DebugType=none"
 if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed" }
 
-# 2) Portable zip.
-$zipPath = Join-Path $distDir "WindowsCleanerTool-$Version-win-x64-portable.zip"
-if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
-Write-Host "==> Creating portable zip..." -ForegroundColor Cyan
-Compress-Archive -Path (Join-Path $publishDir "*") -DestinationPath $zipPath
+# 2) Copy the single exe to dist with a friendly, versioned name.
+$sourceExe = Join-Path $publishDir "WindowsCleaner.App.exe"
+if (-not (Test-Path $sourceExe)) { throw "Expected single-file output not found: $sourceExe" }
+$portableExe = Join-Path $distDir "WindowsCleanerTool-$Version-portable.exe"
+Copy-Item $sourceExe $portableExe -Force
 
-# 3) Portable archive is the only distributable (portable-only tool).
-Write-Host "`n==> Done. Artifacts in $distDir :" -ForegroundColor Green
+Write-Host "`n==> Done. Single portable file in $distDir :" -ForegroundColor Green
 Get-ChildItem $distDir -File |
     Select-Object Name, @{ n = "Size"; e = { "{0:N1} MB" -f ($_.Length / 1MB) } } |
     Format-Table -AutoSize

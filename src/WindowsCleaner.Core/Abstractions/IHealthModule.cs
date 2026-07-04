@@ -3,7 +3,7 @@ using WindowsCleaner.Core.Models;
 namespace WindowsCleaner.Core.Abstractions;
 
 /// <summary>
-/// A self-contained diagnostic + repair capability. Both the WinUI app and the CLI
+/// A self-contained diagnostic + repair capability. Both the desktop app and the CLI
 /// consume modules through this interface, so new features are just new implementations.
 /// </summary>
 public interface IHealthModule

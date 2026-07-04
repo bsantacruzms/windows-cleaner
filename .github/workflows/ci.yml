@@ -22,13 +22,8 @@ jobs:
       - name: Restore
         run: dotnet restore WindowsCleaner.sln
 
-      - name: Build Core, CLI and Tests
-        # The WinUI app requires Windows App SDK workloads; the engine, CLI and
-        # tests build cross-checkable on the hosted runner.
-        run: |
-          dotnet build src/WindowsCleaner.Core/WindowsCleaner.Core.csproj -c Release --no-restore
-          dotnet build src/WindowsCleaner.Cli/WindowsCleaner.Cli.csproj -c Release --no-restore
-          dotnet build tests/WindowsCleaner.Core.Tests/WindowsCleaner.Core.Tests.csproj -c Release --no-restore
+      - name: Build
+        run: dotnet build WindowsCleaner.sln -c Release --no-restore
 
       - name: Test
         run: dotnet test tests/WindowsCleaner.Core.Tests/WindowsCleaner.Core.Tests.csproj -c Release --no-build --verbosity normal

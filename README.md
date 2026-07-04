@@ -6,15 +6,16 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **Status:** v0.2 — early but working. Builds clean (0 warnings / 0 errors) with 14 unit
-tests passing. A one-click **Clean** button (WinUI 3) and a CLI drive six health modules
-on top of a reversible safety layer. Distributed as a **portable** app — no installer.
+tests passing. A one-click **Clean** button (WPF) and a CLI drive six health modules
+on top of a reversible safety layer. Distributed as a single **portable** `.exe` — no installer.
 
 ## Download & install
 
-Windows Cleaner Tool is **portable** — no installation required. Grab the latest `.zip`
-from the **[Releases page](https://github.com/bsantacruzms/windows-cleaner/releases)**,
-unzip it anywhere, and run **`WindowsCleaner.App.exe`**. No prerequisites — the .NET
-runtime is bundled, so it works on a clean Windows install.
+Windows Cleaner Tool is a **single portable `.exe`** — no installation, no unzipping.
+Download **`WindowsCleanerTool-<version>-portable.exe`** from the
+**[Releases page](https://github.com/bsantacruzms/windows-cleaner/releases)** and run it.
+No prerequisites — the .NET runtime and all dependencies are bundled into the one file
+(it self-extracts to a temp folder on first launch), so it works on a clean Windows install.
 
 Just click **Clean** and the tool scans and repairs everything automatically. The header
 shows the app version and your Windows version; if your Windows build is unsupported it
@@ -29,7 +30,7 @@ pushed (see [`.github/workflows/release.yml`](.github/workflows/release.yml)).
 ### Build it yourself
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts/build-release.ps1                 # -> dist/*.zip
+powershell -ExecutionPolicy Bypass -File scripts/build-release.ps1                 # -> dist/*.exe
 powershell -ExecutionPolicy Bypass -File scripts/build-release.ps1 -Version 0.2.0
 ```
 
@@ -65,14 +66,14 @@ Every fix is reversible, supports a **dry-run** preview, and is logged.
 ```
 src/
   WindowsCleaner.Core/   Engine: modules, models, safety layer, process runner
-  WindowsCleaner.App/    WinUI 3 (Fluent) desktop dashboard — runs elevated
-  WindowsCleaner.Cli/    Scriptable command-line runner (scan / fix / schedule)
+  WindowsCleaner.App/    WPF desktop dashboard (single-file portable) — runs elevated
+  WindowsCleaner.Cli/    Scriptable command-line runner (scan / fix / clean)
 tests/
   WindowsCleaner.Core.Tests/   Unit tests for the engine
 ```
 
 The engine is UI-agnostic: every capability is an `IHealthModule` that can `ScanAsync`
-and `FixAsync`. Both the WinUI app and the CLI consume the exact same modules.
+and `FixAsync`. Both the desktop app and the CLI consume the exact same modules.
 
 ## Requirements
 
@@ -92,11 +93,11 @@ dotnet run --project src/WindowsCleaner.Cli -- scan
 # Preview fixes without changing anything
 dotnet run --project src/WindowsCleaner.Cli -- fix --all --dry-run
 
-# Run the WinUI desktop app
+# Run the desktop app
 dotnet run --project src/WindowsCleaner.App
 ```
 
-> The WinUI app ships with a `requireAdministrator` manifest, so Windows prompts for
+> The desktop app ships with a `requireAdministrator` manifest, so Windows prompts for
 > elevation (UAC) when you launch it — repairs need administrator rights.
 
 ### CLI reference

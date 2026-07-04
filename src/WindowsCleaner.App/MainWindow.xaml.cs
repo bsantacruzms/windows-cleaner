@@ -1,7 +1,5 @@
 using System.Collections.ObjectModel;
-using Microsoft.UI.Dispatching;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
+using System.Windows;
 using WindowsCleaner.Core;
 using WindowsCleaner.Core.Diagnostics;
 using WindowsCleaner.Core.Models;
@@ -9,11 +7,10 @@ using WindowsCleaner.Core.Modules.TempCleanup;
 
 namespace WindowsCleaner.App;
 
-public sealed partial class MainWindow : Window
+public partial class MainWindow : Window
 {
     private readonly HealthEngine _engine = new(DefaultModules.CreateAll());
     private readonly ObservableCollection<IssueRow> _issues = new();
-    private readonly DispatcherQueue _dispatcher = DispatcherQueue.GetForCurrentThread();
     private readonly EnvironmentInfo _env = EnvironmentInfo.Current();
 
     public MainWindow()
@@ -22,24 +19,24 @@ public sealed partial class MainWindow : Window
         IssuesList.ItemsSource = _issues;
         IssuesList.SelectionChanged += (_, _) => UpdateFixSelectedState();
 
-        EnvText.Text = $"App {_env.AppVersion}   \u00b7   {_env.WindowsName}";
+        EnvText.Text = $"App {_env.AppVersion}   \u2022   {_env.WindowsName}";
         if (!_env.IsSupported)
         {
-            SupportBar.Message = _env.SupportMessage;
-            SupportBar.IsOpen = true;
+            SupportText.Text = _env.SupportMessage;
+            SupportBar.Visibility = Visibility.Visible;
         }
     }
 
     // One-click clean: scan + auto-fix all safe cleanup/repair issues.
     private async void OnCleanClick(object sender, RoutedEventArgs e)
     {
-        if (!_env.IsSupported && !await ConfirmUnsupportedAsync())
+        if (!_env.IsSupported && !ConfirmUnsupported())
         {
             return;
         }
 
         SetBusy(true, "Scanning your system...");
-        var progress = new Progress<string>(msg => _dispatcher.TryEnqueue(() => StatusText.Text = msg));
+        var progress = new Progress<string>(msg => StatusText.Text = msg);
         try
         {
             var summary = await _engine.AutoCleanAsync(new FixOptions(), progress);
@@ -130,32 +127,27 @@ public sealed partial class MainWindow : Window
             _issues.Add(new IssueRow(issue));
         }
 
-        ScoreText.Text = $"{report.Score}/100 \u00b7 {report.Rating}";
+        ScoreText.Text = $"{report.Score}/100 \u2022 {report.Rating}";
     }
 
-    private async Task<bool> ConfirmUnsupportedAsync()
+    private bool ConfirmUnsupported()
     {
-        var dialog = new ContentDialog
-        {
-            Title = "Unsupported Windows version",
-            Content = _env.SupportMessage + "\n\nDo you want to run anyway?",
-            PrimaryButtonText = "Run anyway",
-            CloseButtonText = "Cancel",
-            DefaultButton = ContentDialogButton.Close,
-            XamlRoot = Content.XamlRoot
-        };
-
-        return await dialog.ShowAsync() == ContentDialogResult.Primary;
+        var result = MessageBox.Show(
+            _env.SupportMessage + "\n\nDo you want to run anyway?",
+            "Unsupported Windows version",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+        return result == MessageBoxResult.Yes;
     }
 
     private void UpdateFixSelectedState()
-        => FixSelectedButton.IsEnabled = !Busy.IsActive && IssuesList.SelectedItems.Count > 0;
+        => FixSelectedButton.IsEnabled = Busy.Visibility != Visibility.Visible && IssuesList.SelectedItems.Count > 0;
 
     private void SetBusy(bool busy, string? status)
     {
-        Busy.IsActive = busy;
+        Busy.Visibility = busy ? Visibility.Visible : Visibility.Collapsed;
         CleanButton.IsEnabled = !busy;
-        CleanButtonText.Text = busy ? "Working..." : "Clean";
+        CleanButton.Content = busy ? "Working..." : "Clean";
         UpdateFixSelectedState();
         if (status is not null)
         {
