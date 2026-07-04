@@ -43,13 +43,28 @@ async Task CleanAsync()
         Console.WriteLine("WARNING: not running as Administrator; some fixes may fail.\n");
     }
 
-    var progress = new Progress<string>(Console.WriteLine);
+    var progress = new InlineProgress<FixProgress>(PrintFixProgress);
     var summary = await engine.AutoCleanAsync(new FixOptions { DryRun = dryRun }, progress);
 
     Console.WriteLine();
     Console.WriteLine($"Clean complete: fixed {summary.Fixed}, failed {summary.Failed}, " +
         $"freed {TempCleanupModule.FormatBytes(summary.ReclaimedBytes)}.");
 }
+
+void PrintFixProgress(FixProgress p)
+{
+    if (p.Phase == FixPhase.Starting)
+    {
+        var eta = TimeSpan.FromSeconds(p.EstimatedTotalSeconds);
+        Console.WriteLine($"[{p.Index}/{p.Total}] {p.Title}  (elapsed {Fmt(p.Elapsed)} / est {Fmt(eta)})");
+    }
+    else
+    {
+        Console.WriteLine($"        -> {(p.Success ? "done" : "FAILED")}");
+    }
+}
+
+string Fmt(TimeSpan t) => t.TotalHours >= 1 ? t.ToString(@"h\:mm\:ss") : t.ToString(@"m\:ss");
 
 void PrintEnvironment()
 {
@@ -88,19 +103,22 @@ async Task FixAsync()
         .ToList();
 
     var options = new FixOptions { DryRun = dryRun };
-    Console.WriteLine($"\nApplying {fixable.Count} fix(es){(dryRun ? " (dry run)" : string.Empty)}...\n");
+    var estTotal = fixable.Sum(i => Math.Max(1, i.EstimatedSeconds));
+    Console.WriteLine($"\nApplying {fixable.Count} fix(es){(dryRun ? " (dry run)" : string.Empty)} - estimated ~{Fmt(TimeSpan.FromSeconds(estTotal))}...\n");
 
-    foreach (var issue in fixable)
+    var progress = new InlineProgress<FixProgress>(PrintFixProgress);
+    var results = await engine.FixManyAsync(fixable, options, progress);
+
+    var succeeded = results.Count(r => r.Success);
+    for (var i = 0; i < results.Count; i++)
     {
-        var result = await engine.FixAsync(issue, options);
-        var tag = result.Success ? (result.WasDryRun ? "DRYRUN" : "FIXED ") : "FAIL  ";
-        Console.WriteLine($"[{tag}] {issue.Title}");
-        Console.WriteLine($"         {result.Message}");
-        if (result.BackupPath is not null)
+        if (!results[i].Success)
         {
-            Console.WriteLine($"         backup: {result.BackupPath}");
+            Console.WriteLine($"   ! {fixable[i].Title}: {results[i].Message}");
         }
     }
+
+    Console.WriteLine($"\nDone: {succeeded}/{results.Count} succeeded.");
 }
 
 string? GetOption(string name)
@@ -146,8 +164,12 @@ void PrintHelp()
           wclean fix --all [--dry-run]            Fix all fixable issues
           wclean fix --module <id> [--dry-run]    Fix issues from a single module
 
-        Modules: store-appx, temp-cleanup, windows-update, system-integrity, startup, privacy
+        Module ids: store-appx, temp-cleanup, windows-update, system-integrity, startup, privacy, drivers
 
         Tip: run from an elevated terminal for system repairs.
         """);
+}
+file sealed class InlineProgress<T>(Action<T> onReport) : IProgress<T>
+{
+    public void Report(T value) => onReport(value);
 }

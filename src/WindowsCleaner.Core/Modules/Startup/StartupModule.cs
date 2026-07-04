@@ -55,6 +55,7 @@ public sealed class StartupModule : IHealthModule
                 Severity = IssueSeverity.Info,
                 IsFixable = true,
                 Recommendation = "Disable if you don't need it to launch at sign-in.",
+                EstimatedSeconds = 1,
                 Data = new Dictionary<string, string>
                 {
                     ["hive"] = hiveName,

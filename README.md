@@ -60,6 +60,7 @@ Every fix is reversible, supports a **dry-run** preview, and is logged.
 | **System Integrity** | Runs `DISM /RestoreHealth` and `SFC /scannow` and surfaces the results. |
 | **Startup & Services** | Lists startup entries and heavy/optional services; lets you disable them (with backup). |
 | **Privacy Cleanup** | Reviews common telemetry/privacy switches and hardens them on request. |
+| **Drivers (official)** | Detects your motherboard/system and any problem devices, then links to the **manufacturer's official** driver page and Windows Update. Never installs third-party drivers. |
 
 ## Architecture
 
@@ -110,7 +111,7 @@ wclean fix --module <id> [--dry-run]    Fix issues from a single module
 ```
 
 Module ids: `store-appx`, `temp-cleanup`, `windows-update`, `system-integrity`,
-`startup`, `privacy`.
+`startup`, `privacy`, `drivers`.
 
 Example scan output:
 

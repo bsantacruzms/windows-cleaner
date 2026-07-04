@@ -64,6 +64,7 @@ public sealed class WindowsUpdateResetModule : IHealthModule
                 IsFixable = true,
                 ReclaimableBytes = size,
                 Recommendation = "Reset the update cache.",
+                EstimatedSeconds = 15,
                 Data = new Dictionary<string, string> { ["action"] = "reset-sd" }
             });
         }

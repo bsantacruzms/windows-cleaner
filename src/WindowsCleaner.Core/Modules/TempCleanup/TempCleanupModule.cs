@@ -54,6 +54,7 @@ public sealed class TempCleanupModule : IHealthModule
                 Severity = size > 1_000_000_000 ? IssueSeverity.Medium : IssueSeverity.Low,
                 IsFixable = true,
                 ReclaimableBytes = size,
+                EstimatedSeconds = (int)Math.Max(2L, size / (200L * 1024 * 1024)),
                 Recommendation = "Safe to clear.",
                 Data = new Dictionary<string, string> { ["path"] = path }
             });

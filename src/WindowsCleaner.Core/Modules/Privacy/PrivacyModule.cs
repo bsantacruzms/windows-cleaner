@@ -61,6 +61,7 @@ public sealed class PrivacyModule : IHealthModule
                 Severity = IssueSeverity.Low,
                 IsFixable = true,
                 Recommendation = "Turn this off.",
+                EstimatedSeconds = 1,
                 Data = new Dictionary<string, string>
                 {
                     ["subkey"] = toggle.SubKey,

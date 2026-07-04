@@ -24,7 +24,7 @@ public sealed class HealthReport
                     IssueSeverity.High => 15,
                     IssueSeverity.Medium => 8,
                     IssueSeverity.Low => 3,
-                    _ => 1
+                    _ => 0 // Info items are actions/notes, not health problems
                 };
             }
 

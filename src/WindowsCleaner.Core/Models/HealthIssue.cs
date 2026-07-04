@@ -26,6 +26,9 @@ public sealed class HealthIssue
     /// <summary>Disk space (bytes) that fixing this issue would reclaim, if applicable.</summary>
     public long ReclaimableBytes { get; init; }
 
+    /// <summary>Rough estimate (seconds) of how long fixing this issue takes; used for progress/ETA.</summary>
+    public int EstimatedSeconds { get; init; } = 3;
+
     /// <summary>Opaque key/value payload the module uses to perform the fix.</summary>
     public IReadOnlyDictionary<string, string> Data { get; init; } =
         new Dictionary<string, string>();

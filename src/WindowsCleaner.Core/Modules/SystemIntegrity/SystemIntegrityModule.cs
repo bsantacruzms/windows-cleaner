@@ -30,6 +30,7 @@ public sealed class SystemIntegrityModule : IHealthModule
             Severity = IssueSeverity.Info,
             IsFixable = true,
             Recommendation = "Run DISM /RestoreHealth then SFC /scannow.",
+            EstimatedSeconds = 240,
             Data = new Dictionary<string, string> { ["action"] = "sfc-dism" }
         };
 

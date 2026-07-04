@@ -92,6 +92,7 @@ public sealed class StoreAppxModule : IHealthModule
                     Severity = IssueSeverity.Medium,
                     IsFixable = true,
                     Recommendation = "Remove and let the Store reinstall a clean copy.",
+                    EstimatedSeconds = 8,
                     Data = new Dictionary<string, string>
                     {
                         ["kind"] = "appx",
@@ -150,6 +151,7 @@ public sealed class StoreAppxModule : IHealthModule
                     Severity = IssueSeverity.High,
                     IsFixable = true,
                     Recommendation = "Remove the stale registration (a registry backup is created first).",
+                    EstimatedSeconds = 3,
                     Data = new Dictionary<string, string>
                     {
                         ["kind"] = "gs-orphan",
@@ -247,6 +249,7 @@ public sealed class StoreAppxModule : IHealthModule
         Severity = IssueSeverity.High,
         IsFixable = true,
         Recommendation = "Remove the broken registration (a restore point is created first).",
+        EstimatedSeconds = 8,
         Data = new Dictionary<string, string>
         {
             ["kind"] = "appx",
