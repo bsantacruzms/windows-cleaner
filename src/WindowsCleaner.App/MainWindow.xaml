@@ -210,6 +210,68 @@
                 </Grid>
             </TabItem>
 
+            <!-- ===================== PRIVACY TAB ===================== -->
+            <TabItem x:Name="PrivacyTab" Header="Privacy" Style="{StaticResource DarkTab}">
+                <Grid Margin="0,12,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Background="#FF1D1D24" CornerRadius="12" Padding="16,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" x:Name="HardenButton" Content="Apply privacy hardening" Click="OnHardenClick"
+                                    Style="{StaticResource AccentButton}" FontSize="15" Padding="18,9" />
+                            <TextBlock Grid.Column="1" x:Name="PrivacyStatusText" Foreground="#FF8A8A96" FontSize="12"
+                                       VerticalAlignment="Center" Margin="14,0,0,0" TextWrapping="Wrap"
+                                       Text="Disables telemetry and tracking. Everything here is reversible." />
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button Content="Select all" Click="OnSelectAllPrivacyClick" Style="{StaticResource FlatButton}" />
+                                <Button Content="Revert" Click="OnRevertPrivacyClick" Style="{StaticResource FlatButton}" />
+                                <Button Content="Refresh" Click="OnRefreshPrivacyClick" Style="{StaticResource FlatButton}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <ScrollViewer Grid.Row="1" Margin="0,12,0,0" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl x:Name="PrivacyList">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="#FF23232B" CornerRadius="10" Padding="14" Margin="0,0,0,8">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <CheckBox Grid.Column="0" IsChecked="{Binding Selected, Mode=TwoWay}"
+                                                      VerticalAlignment="Center" Margin="0,0,12,0" />
+                                            <StackPanel Grid.Column="1">
+                                                <TextBlock Text="{Binding Title}" Foreground="White" FontWeight="SemiBold" FontSize="14" TextWrapping="Wrap" />
+                                                <TextBlock Text="{Binding Description}" Foreground="#FF9A9AA5" FontSize="12" TextWrapping="Wrap" Margin="0,3,0,0" />
+                                            </StackPanel>
+                                            <Border Grid.Column="2" Background="{Binding StateBrush}" CornerRadius="6" Padding="8,3"
+                                                    VerticalAlignment="Center" Margin="10,0,0,0">
+                                                <TextBlock Text="{Binding StateText}" Foreground="White" FontSize="11" FontWeight="SemiBold" />
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <TextBlock Grid.Row="2" Margin="6,10,6,0" Foreground="#FF6E6E7A" FontSize="11" TextWrapping="Wrap"
+                               Text="Tip: sign out or restart for all changes to fully apply. Use Revert to restore Windows defaults." />
+                </Grid>
+            </TabItem>
+
             <!-- ===================== DISKS TAB ===================== -->
             <TabItem x:Name="DisksTab" Header="Disks" Style="{StaticResource DarkTab}">
                 <Grid Margin="0,12,0,0">

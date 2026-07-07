@@ -5,9 +5,10 @@
 [![CI](https://github.com/bsantacruzms/windows-cleaner/actions/workflows/ci.yml/badge.svg)](https://github.com/bsantacruzms/windows-cleaner/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**Status:** v0.5 — early but working. Builds clean (0 warnings / 0 errors) with 39 unit
-tests passing. A one-click **Clean** button plus a **Disks** tab with disk-health analysis and
-guarded in-app partitioning (WPF), and a CLI. Distributed as a single **portable** `.exe` — no installer.
+**Status:** v0.6 — early but working. Builds clean (0 warnings / 0 errors) with 43 unit
+tests passing. A one-click **Clean** button, a **Privacy** tab that disables Windows
+telemetry and tracking (fully reversible), and a **Disks** tab with disk-health analysis and
+guarded in-app partitioning (WPF), plus a CLI. Distributed as a single **portable** `.exe` — no installer.
 
 ## Download & install
 
@@ -50,7 +51,7 @@ Windows Cleaner Tool is built around a simple loop that mirrors how a good techn
 
 Every fix is reversible, supports a **dry-run** preview, and is logged.
 
-## Health modules (v0.5)
+## Health modules (v0.6)
 
 | Module | What it does |
 | ------ | ------------ |
@@ -59,7 +60,7 @@ Every fix is reversible, supports a **dry-run** preview, and is logged.
 | **Windows Update Reset** | Stops update services, resets `SoftwareDistribution`, clears the stuck download queue. |
 | **System Integrity** | Runs `DISM /RestoreHealth` and `SFC /scannow` and surfaces the results. |
 | **Startup & Services** | Lists startup entries and heavy/optional services; lets you disable them (with backup). |
-| **Privacy Cleanup** | Reviews common telemetry/privacy switches and hardens them on request. |
+| **Privacy Cleanup** | Reviews common telemetry/privacy switches and hardens them on request. The dedicated **Privacy** tab goes further — one click disables telemetry, the advertising ID, activity history, app-launch tracking, tailored experiences, feedback, web search in Start, error reporting and inking/typing data collection, and stops the DiagTrack service. Everything is reversible from the same tab. |
 | **Drivers (official)** | Detects your motherboard/system and any problem devices, then links to the **manufacturer's official** driver page and Windows Update. Never installs third-party drivers. |
 | **Disk Health** | Reports each drive's type (SSD/NVMe/HDD), SMART health, free space and SSD TRIM, and offers **guarded partitioning** (change letter, shrink, extend, create, format, delete — never system/boot, with typed confirmation). Advanced move / merge / clone stays in Windows Disk Management. |
 

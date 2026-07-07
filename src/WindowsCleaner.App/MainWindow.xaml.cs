@@ -7,6 +7,7 @@ using WindowsCleaner.Core;
 using WindowsCleaner.Core.Diagnostics;
 using WindowsCleaner.Core.Models;
 using WindowsCleaner.Core.Modules.Disk;
+using WindowsCleaner.Core.Modules.Privacy;
 using WindowsCleaner.Core.Modules.TempCleanup;
 
 namespace WindowsCleaner.App;
@@ -16,6 +17,7 @@ public partial class MainWindow : Window
     private readonly HealthEngine _engine = new(DefaultModules.CreateAll());
     private readonly ObservableCollection<IssueRow> _issues = new();
     private readonly ObservableCollection<DiskCard> _disks = new();
+    private readonly ObservableCollection<PrivacyTweakVm> _privacyTweaks = new();
     private readonly EnvironmentInfo _env = EnvironmentInfo.Current();
     private bool _disksLoading;
     private VolumeCard? _activeVolume;
@@ -25,6 +27,12 @@ public partial class MainWindow : Window
         InitializeComponent();
         IssuesList.ItemsSource = _issues;
         DisksList.ItemsSource = _disks;
+        PrivacyList.ItemsSource = _privacyTweaks;
+        foreach (var tweak in PrivacyService.GetTweaks())
+        {
+            _privacyTweaks.Add(new PrivacyTweakVm(tweak));
+        }
+
         IssuesList.SelectionChanged += (_, _) => UpdateFixSelectedState();
 
         EnvText.Text = $"App {_env.VersionLabel}   \u2022   {_env.WindowsName}";
@@ -200,6 +208,11 @@ public partial class MainWindow : Window
         if (e.OriginalSource is not TabControl)
         {
             return;
+        }
+
+        if (PrivacyTab.IsSelected)
+        {
+            RefreshPrivacyState();
         }
 
         if (DisksTab.IsSelected && _disks.Count == 0 && !_disksLoading)
@@ -434,6 +447,76 @@ public partial class MainWindow : Window
         }
 
         e.Handled = true;
+    }
+
+    // ---------------- privacy (Privacy tab) ----------------
+
+    private void RefreshPrivacyState()
+    {
+        foreach (var vm in _privacyTweaks)
+        {
+            vm.RefreshState();
+        }
+    }
+
+    private void OnRefreshPrivacyClick(object sender, RoutedEventArgs e)
+    {
+        RefreshPrivacyState();
+        PrivacyStatusText.Text = "Refreshed.";
+    }
+
+    private void OnSelectAllPrivacyClick(object sender, RoutedEventArgs e)
+    {
+        foreach (var vm in _privacyTweaks)
+        {
+            vm.Selected = true;
+        }
+    }
+
+    private async void OnHardenClick(object sender, RoutedEventArgs e) => await ApplyPrivacyAsync(harden: true);
+
+    private async void OnRevertPrivacyClick(object sender, RoutedEventArgs e) => await ApplyPrivacyAsync(harden: false);
+
+    private async Task ApplyPrivacyAsync(bool harden)
+    {
+        var selected = _privacyTweaks.Where(v => v.Selected).ToList();
+        if (selected.Count == 0)
+        {
+            PrivacyStatusText.Text = "Select at least one setting.";
+            return;
+        }
+
+        HardenButton.IsEnabled = false;
+        PrivacyStatusText.Text = harden ? "Applying privacy hardening\u2026" : "Reverting\u2026";
+        try
+        {
+            foreach (var vm in selected)
+            {
+                if (harden)
+                {
+                    await PrivacyService.ApplyAsync(vm.Tweak);
+                }
+                else
+                {
+                    await PrivacyService.RevertAsync(vm.Tweak);
+                }
+
+                vm.RefreshState();
+            }
+
+            var active = _privacyTweaks.Count(v => v.Hardened);
+            PrivacyStatusText.Text = harden
+                ? $"Privacy hardened \u2014 {active}/{_privacyTweaks.Count} active. Sign out or restart for all to take effect."
+                : $"Reverted \u2014 {active}/{_privacyTweaks.Count} still hardened.";
+        }
+        catch (Exception ex)
+        {
+            PrivacyStatusText.Text = "Failed: " + ex.Message;
+        }
+        finally
+        {
+            HardenButton.IsEnabled = true;
+        }
     }
 
     // ---------------- shared ----------------
