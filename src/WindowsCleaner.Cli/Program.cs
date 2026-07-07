@@ -69,7 +69,7 @@ string Fmt(TimeSpan t) => t.TotalHours >= 1 ? t.ToString(@"h\:mm\:ss") : t.ToStr
 void PrintEnvironment()
 {
     var env = EnvironmentInfo.Current();
-    Console.WriteLine($"Windows Cleaner Tool {env.AppVersion}  -  {env.WindowsName}");
+    Console.WriteLine($"Windows Cleaner Tool {env.VersionLabel}  -  {env.WindowsName}");
     if (!env.IsSupported)
     {
         Console.WriteLine("WARNING: " + env.SupportMessage);

@@ -5,8 +5,8 @@
 [![CI](https://github.com/bsantacruzms/windows-cleaner/actions/workflows/ci.yml/badge.svg)](https://github.com/bsantacruzms/windows-cleaner/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**Status:** v0.2 — early but working. Builds clean (0 warnings / 0 errors) with 14 unit
-tests passing. A one-click **Clean** button (WPF) and a CLI drive six health modules
+**Status:** v0.3 — early but working. Builds clean (0 warnings / 0 errors) with 23 unit
+tests passing. A one-click **Clean** button (WPF) and a CLI drive seven health modules
 on top of a reversible safety layer. Distributed as a single **portable** `.exe` — no installer.
 
 ## Download & install
@@ -31,7 +31,7 @@ pushed (see [`.github/workflows/release.yml`](.github/workflows/release.yml)).
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/build-release.ps1                 # -> dist/*.exe
-powershell -ExecutionPolicy Bypass -File scripts/build-release.ps1 -Version 0.2.0
+powershell -ExecutionPolicy Bypass -File scripts/build-release.ps1 -Version 0.3.0
 ```
 
 ## Why another cleaner?
@@ -50,7 +50,7 @@ Windows Cleaner Tool is built around a simple loop that mirrors how a good techn
 
 Every fix is reversible, supports a **dry-run** preview, and is logged.
 
-## Health modules (v0.2)
+## Health modules (v0.3)
 
 | Module | What it does |
 | ------ | ------------ |

@@ -19,7 +19,7 @@ public partial class MainWindow : Window
         IssuesList.ItemsSource = _issues;
         IssuesList.SelectionChanged += (_, _) => UpdateFixSelectedState();
 
-        EnvText.Text = $"App {_env.AppVersion}   \u2022   {_env.WindowsName}";
+        EnvText.Text = $"App {_env.VersionLabel}   \u2022   {_env.WindowsName}";
         if (!_env.IsSupported)
         {
             SupportText.Text = _env.SupportMessage;

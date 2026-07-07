@@ -10,8 +10,13 @@
     <Product>Windows Cleaner Tool</Product>
     <Company>Windows Cleaner Tool (Open Source)</Company>
     <Copyright>Copyright (c) 2026 Brian Santacruz</Copyright>
-    <Version>0.2.0</Version>
+    <Version>0.3.0</Version>
     <RepositoryUrl>https://github.com/bsantacruzms/windows-cleaner.git</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Stamp the UTC build date so the running build is identifiable. -->
+    <AssemblyMetadata Include="BuildDate" Value="$([System.DateTime]::UtcNow.ToString('yyyy-MM-dd'))" />
+  </ItemGroup>
 </Project>
