@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Navigation;
 using WindowsCleaner.Core;
 using WindowsCleaner.Core.Diagnostics;
 using WindowsCleaner.Core.Models;
@@ -16,6 +18,7 @@ public partial class MainWindow : Window
     private readonly ObservableCollection<DiskCard> _disks = new();
     private readonly EnvironmentInfo _env = EnvironmentInfo.Current();
     private bool _disksLoading;
+    private VolumeCard? _activeVolume;
 
     public MainWindow()
     {
@@ -241,6 +244,196 @@ public partial class MainWindow : Window
         {
             _disksLoading = false;
         }
+    }
+
+    // ---------------- partition actions (Disks tab) ----------------
+
+    private void OnManageVolumeClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement fe || fe.DataContext is not VolumeCard vc || vc.Volume.Letter is null)
+        {
+            return;
+        }
+
+        _activeVolume = vc;
+        var protectedVolume = vc.Volume.IsSystem || vc.Volume.IsBoot;
+
+        var menu = new ContextMenu();
+        menu.Items.Add(Item("Change drive letter\u2026", OnChangeLetter, true));
+        menu.Items.Add(Item("Extend into free space", OnExtend, true));
+        menu.Items.Add(Item("Shrink\u2026", OnShrink, true));
+        menu.Items.Add(new Separator());
+        menu.Items.Add(Item("Format\u2026", OnFormat, !protectedVolume));
+        menu.Items.Add(Item("Delete volume\u2026", OnDelete, !protectedVolume));
+        menu.PlacementTarget = fe;
+        menu.IsOpen = true;
+
+        static MenuItem Item(string header, RoutedEventHandler handler, bool enabled)
+        {
+            var item = new MenuItem { Header = header, IsEnabled = enabled };
+            item.Click += handler;
+            return item;
+        }
+    }
+
+    private async void OnChangeLetter(object sender, RoutedEventArgs e)
+    {
+        if (_activeVolume?.Volume.Letter is not { } letter)
+        {
+            return;
+        }
+
+        var input = PromptDialog.Show(this, "Change drive letter",
+            $"New drive letter for {letter}: (a single letter that isn't already in use):");
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            return;
+        }
+
+        var newLetter = input.Trim().TrimEnd(':').ToUpperInvariant();
+        await RunDiskOp(() => PartitionService.ChangeLetterAsync(letter, newLetter));
+    }
+
+    private async void OnExtend(object sender, RoutedEventArgs e)
+    {
+        if (_activeVolume?.Volume.Letter is not { } letter)
+        {
+            return;
+        }
+
+        if (MessageBox.Show($"Extend {letter}: into the adjacent free space?", "Extend volume",
+                MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+        {
+            return;
+        }
+
+        await RunDiskOp(() => PartitionService.ExtendAsync(letter));
+    }
+
+    private async void OnShrink(object sender, RoutedEventArgs e)
+    {
+        if (_activeVolume?.Volume.Letter is not { } letter)
+        {
+            return;
+        }
+
+        var input = PromptDialog.Show(this, "Shrink volume", $"Shrink {letter}: by how many GB?", "10");
+        if (input is null)
+        {
+            return;
+        }
+
+        if (!double.TryParse(input, out var gb) || gb <= 0)
+        {
+            DiskStatusText.Text = "Enter a positive number of GB.";
+            return;
+        }
+
+        await RunDiskOp(() => PartitionService.ShrinkByAsync(letter, (long)(gb * 1024 * 1024 * 1024)));
+    }
+
+    private async void OnFormat(object sender, RoutedEventArgs e)
+    {
+        if (_activeVolume is not { } vc || vc.Volume.Letter is not { } letter || vc.Volume.IsSystem || vc.Volume.IsBoot)
+        {
+            return;
+        }
+
+        var label = PromptDialog.Show(this, "Format volume",
+            $"New label for {letter}: (formatted as NTFS). This ERASES all data on {letter}:.", vc.Volume.Label ?? string.Empty);
+        if (label is null)
+        {
+            return;
+        }
+
+        var confirm = PromptDialog.Show(this, "Confirm format",
+            $"This ERASES everything on {letter}:.\n\nType {letter} to confirm:");
+        if (!string.Equals(confirm?.Trim().TrimEnd(':'), letter, StringComparison.OrdinalIgnoreCase))
+        {
+            DiskStatusText.Text = "Format cancelled.";
+            return;
+        }
+
+        await RunDiskOp(() => PartitionService.FormatAsync(letter, "NTFS", label));
+    }
+
+    private async void OnDelete(object sender, RoutedEventArgs e)
+    {
+        if (_activeVolume is not { } vc || vc.Volume.Letter is not { } letter || vc.Volume.IsSystem || vc.Volume.IsBoot)
+        {
+            return;
+        }
+
+        var confirm = PromptDialog.Show(this, "Delete volume",
+            $"This DELETES volume {letter}: and all its data (the space becomes unallocated).\n\nType {letter} to confirm:");
+        if (!string.Equals(confirm?.Trim().TrimEnd(':'), letter, StringComparison.OrdinalIgnoreCase))
+        {
+            DiskStatusText.Text = "Delete cancelled.";
+            return;
+        }
+
+        await RunDiskOp(() => PartitionService.DeleteAsync(letter));
+    }
+
+    private async void OnCreatePartitionClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement fe || fe.DataContext is not DiskCard dc)
+        {
+            return;
+        }
+
+        var sizeInput = PromptDialog.Show(this, "New partition",
+            $"Size in GB for the new partition on Disk {dc.Disk.Number} (leave blank to use all {dc.FreeLabel}):");
+        if (sizeInput is null)
+        {
+            return;
+        }
+
+        long? bytes = null;
+        if (!string.IsNullOrWhiteSpace(sizeInput))
+        {
+            if (!double.TryParse(sizeInput, out var gb) || gb <= 0)
+            {
+                DiskStatusText.Text = "Enter a positive number of GB.";
+                return;
+            }
+
+            bytes = (long)(gb * 1024 * 1024 * 1024);
+        }
+
+        var label = PromptDialog.Show(this, "New partition", "Volume label (optional):", "New Volume") ?? string.Empty;
+        await RunDiskOp(() => PartitionService.CreateAsync(dc.Disk.Number, bytes, label));
+    }
+
+    private async Task RunDiskOp(Func<Task<OpResult>> operation)
+    {
+        DiskStatusText.Text = "Working\u2026";
+        string message;
+        try
+        {
+            message = (await operation()).Message;
+        }
+        catch (Exception ex)
+        {
+            message = "Failed: " + ex.Message;
+        }
+
+        await LoadDisksAsync();
+        DiskStatusText.Text = message;
+    }
+
+    private void OnOpenWebsite(object sender, RequestNavigateEventArgs e)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+        }
+        catch
+        {
+            // ignore
+        }
+
+        e.Handled = true;
     }
 
     // ---------------- shared ----------------

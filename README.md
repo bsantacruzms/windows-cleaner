@@ -5,9 +5,9 @@
 [![CI](https://github.com/bsantacruzms/windows-cleaner/actions/workflows/ci.yml/badge.svg)](https://github.com/bsantacruzms/windows-cleaner/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**Status:** v0.4 — early but working. Builds clean (0 warnings / 0 errors) with 26 unit
-tests passing. A one-click **Clean** button plus a **Disks** health tab (WPF) and a CLI drive
-eight health modules on top of a reversible safety layer. Distributed as a single **portable** `.exe` — no installer.
+**Status:** v0.5 — early but working. Builds clean (0 warnings / 0 errors) with 39 unit
+tests passing. A one-click **Clean** button plus a **Disks** tab with disk-health analysis and
+guarded in-app partitioning (WPF), and a CLI. Distributed as a single **portable** `.exe` — no installer.
 
 ## Download & install
 
@@ -50,7 +50,7 @@ Windows Cleaner Tool is built around a simple loop that mirrors how a good techn
 
 Every fix is reversible, supports a **dry-run** preview, and is logged.
 
-## Health modules (v0.4)
+## Health modules (v0.5)
 
 | Module | What it does |
 | ------ | ------------ |
@@ -61,7 +61,7 @@ Every fix is reversible, supports a **dry-run** preview, and is logged.
 | **Startup & Services** | Lists startup entries and heavy/optional services; lets you disable them (with backup). |
 | **Privacy Cleanup** | Reviews common telemetry/privacy switches and hardens them on request. |
 | **Drivers (official)** | Detects your motherboard/system and any problem devices, then links to the **manufacturer's official** driver page and Windows Update. Never installs third-party drivers. |
-| **Disk Health** | Reports each drive's type (SSD/NVMe/HDD), SMART health, free space and SSD TRIM. Read-only — advanced partitioning is delegated to Windows Disk Management to keep data safe. |
+| **Disk Health** | Reports each drive's type (SSD/NVMe/HDD), SMART health, free space and SSD TRIM, and offers **guarded partitioning** (change letter, shrink, extend, create, format, delete — never system/boot, with typed confirmation). Advanced move / merge / clone stays in Windows Disk Management. |
 
 ## Architecture
 
@@ -161,4 +161,4 @@ module in `DefaultModules.CreateAll` and it shows up in both the app and the CLI
 
 ## License
 
-[MIT](LICENSE) © 2026 Brian Santacruz
+[MIT](LICENSE) © 2026 **Brian Santacruz** — [briansantacruz.com](https://briansantacruz.com)

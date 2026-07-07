@@ -16,6 +16,7 @@ public sealed class PhysicalDiskInfo
     public string PartitionStyle { get; init; } = string.Empty;
     public string MediaType { get; init; } = "Unspecified";
     public int SpindleSpeed { get; init; }
+    public long UnallocatedBytes { get; init; }
     public IReadOnlyList<VolumeInfo> Volumes { get; init; } = Array.Empty<VolumeInfo>();
 
     public bool IsSsd =>

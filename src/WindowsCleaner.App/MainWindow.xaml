@@ -97,6 +97,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <!-- App header -->
@@ -245,9 +246,14 @@
                                                     <TextBlock Text="{Binding Title}" Foreground="White" FontWeight="SemiBold" FontSize="15" TextWrapping="Wrap" />
                                                     <TextBlock Text="{Binding SubInfo}" Foreground="#FF9A9AA5" FontSize="12" Margin="0,2,0,0" />
                                                 </StackPanel>
-                                                <Border Grid.Column="1" Background="{Binding HealthBrush}" CornerRadius="6" Padding="10,4" VerticalAlignment="Top">
-                                                    <TextBlock Text="{Binding Health}" Foreground="White" FontSize="11" FontWeight="SemiBold" />
-                                                </Border>
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+                                                    <Button Content="+ New partition" Click="OnCreatePartitionClick" Style="{StaticResource FlatButton}"
+                                                            FontSize="11" Padding="10,5" Margin="0,0,8,0"
+                                                            Visibility="{Binding CanCreate, Converter={StaticResource BoolToVis}}" />
+                                                    <Border Background="{Binding HealthBrush}" CornerRadius="6" Padding="10,4">
+                                                        <TextBlock Text="{Binding Health}" Foreground="White" FontSize="11" FontWeight="SemiBold" />
+                                                    </Border>
+                                                </StackPanel>
                                             </Grid>
                                             <ItemsControl ItemsSource="{Binding Volumes}" Margin="0,12,0,0">
                                                 <ItemsControl.ItemTemplate>
@@ -256,6 +262,7 @@
                                                             <Grid.ColumnDefinitions>
                                                                 <ColumnDefinition Width="*" />
                                                                 <ColumnDefinition Width="Auto" />
+                                                                <ColumnDefinition Width="Auto" />
                                                             </Grid.ColumnDefinitions>
                                                             <StackPanel Grid.Column="0" Margin="0,0,12,0">
                                                                 <TextBlock Text="{Binding Header}" Foreground="#FFDADAE2" FontSize="12" FontWeight="SemiBold" />
@@ -263,6 +270,8 @@
                                                                              Foreground="{Binding BarBrush}" Background="#FF303039" BorderThickness="0" />
                                                             </StackPanel>
                                                             <TextBlock Grid.Column="1" Text="{Binding SpaceLabel}" Foreground="#FF9A9AA5" FontSize="11" VerticalAlignment="Center" />
+                                                            <Button Grid.Column="2" Content="Manage &#x25BE;" Click="OnManageVolumeClick" Style="{StaticResource FlatButton}"
+                                                                    FontSize="11" Padding="10,5" Margin="12,0,0,0" />
                                                         </Grid>
                                                     </DataTemplate>
                                                 </ItemsControl.ItemTemplate>
@@ -279,5 +288,10 @@
                 </Grid>
             </TabItem>
         </TabControl>
+
+        <TextBlock Grid.Row="2" Margin="4,12,4,0" HorizontalAlignment="Center" Foreground="#FF6E6E7A" FontSize="11">
+            Created by Brian Santacruz&#160;&#160;&#183;&#160;&#160;<Hyperlink NavigateUri="https://briansantacruz.com"
+                RequestNavigate="OnOpenWebsite" Foreground="#FF6E9FFF" TextDecorations="None">briansantacruz.com</Hyperlink>
+        </TextBlock>
     </Grid>
 </Window>

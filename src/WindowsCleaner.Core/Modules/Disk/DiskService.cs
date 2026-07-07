@@ -26,6 +26,8 @@ $disks = Get-Disk | ForEach-Object {
       IsBoot = [bool]$p.IsBoot
     }
   })
+  $alloc = 0
+  foreach ($x in $vols) { if ($x.Size) { $alloc += [int64]$x.Size } }
   [PSCustomObject]@{
     Number = [int]$d.Number
     Name = ('' + $d.FriendlyName)
@@ -35,6 +37,7 @@ $disks = Get-Disk | ForEach-Object {
     PartitionStyle = ('' + $d.PartitionStyle)
     MediaType = if ($phys) { ('' + $phys.MediaType) } else { 'Unspecified' }
     Spindle = if ($phys) { [int]$phys.SpindleSpeed } else { 0 }
+    Free = [int64]([math]::Max(0, $d.Size - $alloc))
     Volumes = $vols
   }
 }
@@ -96,6 +99,7 @@ $disks = Get-Disk | ForEach-Object {
                     PartitionStyle = Str(d, "PartitionStyle") ?? string.Empty,
                     MediaType = Str(d, "MediaType") ?? "Unspecified",
                     SpindleSpeed = Int(d, "Spindle"),
+                    UnallocatedBytes = Long(d, "Free"),
                     Volumes = volumes
                 });
             }

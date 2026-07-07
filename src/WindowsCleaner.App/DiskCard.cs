@@ -28,6 +28,11 @@ public sealed class DiskCard
 
     public IReadOnlyList<VolumeCard> Volumes { get; }
     public bool HasVolumes => Volumes.Count > 0;
+
+    /// <summary>True when the disk has enough unallocated space to create a new partition.</summary>
+    public bool CanCreate => Disk.UnallocatedBytes > 100L * 1024 * 1024;
+
+    public string FreeLabel => TempCleanupModule.FormatBytes(Disk.UnallocatedBytes);
 }
 
 /// <summary>Bindable wrapper for a single volume with a used/free bar.</summary>
