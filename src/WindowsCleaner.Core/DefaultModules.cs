@@ -1,4 +1,5 @@
 using WindowsCleaner.Core.Abstractions;
+using WindowsCleaner.Core.Modules.Disk;
 using WindowsCleaner.Core.Modules.Drivers;
 using WindowsCleaner.Core.Modules.Privacy;
 using WindowsCleaner.Core.Modules.Startup;
@@ -25,7 +26,8 @@ public static class DefaultModules
             new SystemIntegrityModule(),
             new StartupModule(safety),
             new PrivacyModule(safety),
-            new DriversModule()
+            new DriversModule(),
+            new DiskHealthModule()
         };
     }
 }

@@ -1,8 +1,10 @@
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Controls;
 using WindowsCleaner.Core;
 using WindowsCleaner.Core.Diagnostics;
 using WindowsCleaner.Core.Models;
+using WindowsCleaner.Core.Modules.Disk;
 using WindowsCleaner.Core.Modules.TempCleanup;
 
 namespace WindowsCleaner.App;
@@ -11,12 +13,15 @@ public partial class MainWindow : Window
 {
     private readonly HealthEngine _engine = new(DefaultModules.CreateAll());
     private readonly ObservableCollection<IssueRow> _issues = new();
+    private readonly ObservableCollection<DiskCard> _disks = new();
     private readonly EnvironmentInfo _env = EnvironmentInfo.Current();
+    private bool _disksLoading;
 
     public MainWindow()
     {
         InitializeComponent();
         IssuesList.ItemsSource = _issues;
+        DisksList.ItemsSource = _disks;
         IssuesList.SelectionChanged += (_, _) => UpdateFixSelectedState();
 
         EnvText.Text = $"App {_env.VersionLabel}   \u2022   {_env.WindowsName}";
@@ -27,7 +32,8 @@ public partial class MainWindow : Window
         }
     }
 
-    // One-click clean: scan, show what will be cleaned, then fix with live per-item progress.
+    // ---------------- Clean tab ----------------
+
     private async void OnCleanClick(object sender, RoutedEventArgs e)
     {
         if (!_env.IsSupported && !ConfirmUnsupported())
@@ -135,7 +141,6 @@ public partial class MainWindow : Window
         }
     }
 
-    // Progress<T> constructed on the UI thread marshals callbacks back to it automatically.
     private Progress<FixProgress> CreateFixProgress()
     {
         return new Progress<FixProgress>(p =>
@@ -183,6 +188,62 @@ public partial class MainWindow : Window
         ShowIssues(report.AllIssues.Where(i => i.IsFixable).ToList());
         ScoreText.Text = report.Score.ToString();
     }
+
+    // ---------------- Disks tab ----------------
+
+    private async void OnTabChanged(object sender, SelectionChangedEventArgs e)
+    {
+        // Ignore SelectionChanged bubbling up from child selectors (e.g. the findings ListView).
+        if (e.OriginalSource is not TabControl)
+        {
+            return;
+        }
+
+        if (DisksTab.IsSelected && _disks.Count == 0 && !_disksLoading)
+        {
+            await LoadDisksAsync();
+        }
+    }
+
+    private async void OnRefreshDisksClick(object sender, RoutedEventArgs e) => await LoadDisksAsync();
+
+    private void OnOpenDiskMgmtClick(object sender, RoutedEventArgs e) => DiskService.OpenDiskManagement();
+
+    private void OnOpenDiskCleanupClick(object sender, RoutedEventArgs e) => DiskService.OpenDiskCleanup();
+
+    private async Task LoadDisksAsync()
+    {
+        if (_disksLoading)
+        {
+            return;
+        }
+
+        _disksLoading = true;
+        DiskStatusText.Text = "Scanning disks...";
+        try
+        {
+            var inventory = await DiskService.GetInventoryAsync();
+            _disks.Clear();
+            foreach (var disk in inventory.Disks)
+            {
+                _disks.Add(new DiskCard(disk));
+            }
+
+            DiskStatusText.Text = _disks.Count == 0
+                ? "No disks found."
+                : $"{_disks.Count} drive(s). Read-only analysis \u2014 use Disk Management for resize / move / merge.";
+        }
+        catch (Exception ex)
+        {
+            DiskStatusText.Text = "Disk scan failed: " + ex.Message;
+        }
+        finally
+        {
+            _disksLoading = false;
+        }
+    }
+
+    // ---------------- shared ----------------
 
     private bool ConfirmUnsupported()
     {

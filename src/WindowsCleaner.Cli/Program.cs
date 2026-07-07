@@ -164,7 +164,7 @@ void PrintHelp()
           wclean fix --all [--dry-run]            Fix all fixable issues
           wclean fix --module <id> [--dry-run]    Fix issues from a single module
 
-        Module ids: store-appx, temp-cleanup, windows-update, system-integrity, startup, privacy, drivers
+        Module ids: store-appx, temp-cleanup, windows-update, system-integrity, startup, privacy, drivers, disk-health
 
         Tip: run from an elevated terminal for system repairs.
         """);

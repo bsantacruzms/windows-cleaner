@@ -5,9 +5,9 @@
 [![CI](https://github.com/bsantacruzms/windows-cleaner/actions/workflows/ci.yml/badge.svg)](https://github.com/bsantacruzms/windows-cleaner/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**Status:** v0.3 — early but working. Builds clean (0 warnings / 0 errors) with 23 unit
-tests passing. A one-click **Clean** button (WPF) and a CLI drive seven health modules
-on top of a reversible safety layer. Distributed as a single **portable** `.exe` — no installer.
+**Status:** v0.4 — early but working. Builds clean (0 warnings / 0 errors) with 26 unit
+tests passing. A one-click **Clean** button plus a **Disks** health tab (WPF) and a CLI drive
+eight health modules on top of a reversible safety layer. Distributed as a single **portable** `.exe` — no installer.
 
 ## Download & install
 
@@ -50,7 +50,7 @@ Windows Cleaner Tool is built around a simple loop that mirrors how a good techn
 
 Every fix is reversible, supports a **dry-run** preview, and is logged.
 
-## Health modules (v0.3)
+## Health modules (v0.4)
 
 | Module | What it does |
 | ------ | ------------ |
@@ -61,6 +61,7 @@ Every fix is reversible, supports a **dry-run** preview, and is logged.
 | **Startup & Services** | Lists startup entries and heavy/optional services; lets you disable them (with backup). |
 | **Privacy Cleanup** | Reviews common telemetry/privacy switches and hardens them on request. |
 | **Drivers (official)** | Detects your motherboard/system and any problem devices, then links to the **manufacturer's official** driver page and Windows Update. Never installs third-party drivers. |
+| **Disk Health** | Reports each drive's type (SSD/NVMe/HDD), SMART health, free space and SSD TRIM. Read-only — advanced partitioning is delegated to Windows Disk Management to keep data safe. |
 
 ## Architecture
 
@@ -111,7 +112,7 @@ wclean fix --module <id> [--dry-run]    Fix issues from a single module
 ```
 
 Module ids: `store-appx`, `temp-cleanup`, `windows-update`, `system-integrity`,
-`startup`, `privacy`, `drivers`.
+`startup`, `privacy`, `drivers`, `disk-health`.
 
 Example scan output:
 
